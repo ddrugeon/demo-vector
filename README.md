@@ -13,7 +13,7 @@ To illustrate this tools in action, I deploy [Bunyant Emojivoto application](htt
 
 To deploy this application, run the following command:
 ```bash
-kubectl apply -k app/deployment/
+kubectl apply -k emojivoto/base/
 ```
 
 And then check if it is properly working:
