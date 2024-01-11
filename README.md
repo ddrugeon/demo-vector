@@ -13,7 +13,7 @@ To illustrate this tools in action, I deploy [Bunyant Emojivoto application](htt
 
 To deploy this application, run the following command:
 ```bash
-kubectl apply -k app/deployment/
+kubectl apply -k emojivoto/base/
 ```
 
 And then check if it is properly working:
@@ -31,6 +31,35 @@ You can port forward web-svc to check if service is healthy:
 kubectl port-forward -n emojivoto svc/web-svc 9090:80
 ```
 and open your browser at http://localhost:9090
+
+### Install linkerd
+
+Install Linkerd
+```bash
+LINKERD2_VERSION=stable-2.14.8 curl -sL https://run.linkerd.io/install | sh
+linkerd install | kubectl apply -f -
+```
+
+Install Linkerd vizualisation plugin
+```bash
+linkerd viz install | kubectl apply -f -
+```
+Check Linkerd installation
+
+```bash
+linkerd check
+```
+### Install jaeger backend
+
+Install Jaeger backend:
+```bash
+kubectl apply -k jaeger/
+```
+
+Install Linkerd Jaeger plugin and configure Linkerd Opencensus collector to send spans to our Jaeger backend:
+```bash
+linkerd jaeger install --set collector.jaegerAddr='http://jaeger-collector.tracing:14268/api/traces' | kubectl apply -f -
+```
 
 ### Observability stacks
 
