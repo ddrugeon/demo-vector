@@ -1,0 +1,9 @@
+namespace: default
+resources:
+- ../base/
+patches:
+- path: patch.yaml
+  target:
+    kind: Deployment
+    name: traefik
+    labelSelector: app=traefik
