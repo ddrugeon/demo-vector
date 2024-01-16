@@ -1,0 +1,13 @@
+namespace: vector
+images:
+- name: timberio/vector
+  newName: timberio/vector
+  newTag: 0.35.0-distroless-libc
+
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - daemonset.yaml
+  - rbac.yaml
+  - serviceaccount.yaml
+  - service-headless.yaml
