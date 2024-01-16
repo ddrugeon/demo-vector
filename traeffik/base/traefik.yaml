@@ -32,6 +32,8 @@ spec:
             - --api # enable api/dashboard
             - --api.dashboard # activate dashboard
             - --api.insecure
+            - --providers.kubernetesingress=true
+            - --providers.kubernetesingress.ingressclass=traefik
             - --entrypoints.web.address=:80
             - --providers.kubernetescrd
             - --metrics.prometheus.entryPoint=metrics
