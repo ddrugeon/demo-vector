@@ -50,8 +50,10 @@ kind: Service
 metadata:
   name: web-svc
   namespace: emojivoto
+  labels:
+    app: web-svc
+    version: v11
 spec:
-  type: ClusterIP
   selector:
     app: web-svc
   ports:
