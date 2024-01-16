@@ -41,11 +41,8 @@ spec:
             - --ping
             - --ping.entryPoint=web
             - --tracing=true
-            - --tracing.zipkin=true
-            - --tracing.zipkin.httpEndpoint=http://collector.linkerd-jaeger:9411/api/v2/spans
-            - --tracing.zipkin.sameSpan=true
-            - --tracing.zipkin.id128Bit=true
-            - --tracing.zipkin.sampleRate=1
+            - --tracing.jaeger=true
+            - --tracing.jaeger.collector.endpoint=http://collector.linkerd-jaeger:9411/api/traces?format=jaeger.thrift
             - --accesslog=true # output log to stdout
           ports:
             - name: web
