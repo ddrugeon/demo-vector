@@ -63,16 +63,16 @@ spec:
             - name: config
               mountPath: "/etc/vector/"
               readOnly: true
-            - mountPath: /var/log/
+            - mountPath: "/var/log/"
               name: var-log
               readOnly: true
-            - mountPath: /var/lib
+            - mountPath: "/var/lib"
               name: var-lib
               readOnly: true
-            - mountPath: /host/proc
+            - mountPath: "/host/proc"
               name: procfs
               readOnly: true
-            - mountPath: /host/sys
+            - mountPath: "/host/sys"
               name: sysfs
               readOnly: true
       terminationGracePeriodSeconds: 60
@@ -86,14 +86,14 @@ spec:
           hostPath:
             path: "/var/lib/vector"
         - hostPath:
-            path: /var/log/
+            path: "/var/log/"
           name: var-log
         - hostPath:
-            path: /var/lib/
+            path: "/var/lib/"
           name: var-lib
         - hostPath:
-            path: /proc
+            path: "/proc"
           name: procfs
         - hostPath:
-            path: /sys
+            path: "/sys"
           name: sysfs
