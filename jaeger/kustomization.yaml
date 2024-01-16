@@ -1,4 +1,0 @@
-namespace: tracing
-resources:
-- jaeger.yaml
-- namespace.yaml
