@@ -1,0 +1,22 @@
+version: "3"
+
+tasks:
+  start:
+    desc: Start orb k8s cluster
+    cmds:
+      - orb start k8s
+
+  stop:
+    desc: Stop orb k8s cluster
+    cmds:
+      - orb stop k8s
+
+  restart:
+    desc: Restart orb k8s cluster
+    cmds:
+      - orb restart k8s
+
+  destroy:
+    desc: Destroy orb k8s cluster
+    cmds:
+      - orb delete k8s

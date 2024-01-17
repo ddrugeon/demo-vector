@@ -1,0 +1,14 @@
+version: '3'
+
+dotenv:
+  - '.env'
+
+includes:
+  deps: .taskfiles/Taskfile_{{OS}}.yml
+  k8s: .taskfiles/Taskfile_kubernetes.yml
+
+tasks:
+  default:
+    desc: List all tasks
+    cmds:
+      - task --list-all

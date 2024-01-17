@@ -1,0 +1,26 @@
+version: "3"
+
+includes:
+  orb: ./Taskfile_orb.yml
+  k3d: ./Taskfile_k3d.yml
+  kind: ./Taskfile_kind.yml
+
+tasks:
+  get-contexts:
+    desc: return well-known contexts in kubernetes config file
+    cmds:
+      - task deps:need PACKAGE=kubernetes-cli
+      - kubectl config get-contexts
+
+  use-context:
+    desc: switch context to one specified
+    summary: |
+      switch to kubernetes context given by environment variable CONTEXT
+      available contexts should be:
+      * orbstack
+      * kind-demo-vector
+      * k3d-demo-vector
+
+    cmds:
+      - task deps:need PACKAGE=kubernetes-cli
+      - kubectl config use-context {{.CONTEXT}}

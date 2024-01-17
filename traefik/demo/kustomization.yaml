@@ -1,6 +1,8 @@
-namespace: default
+namespace: traefik
 resources:
 - ../base/
+- dashboard-ingressroute.yaml
+
 patches:
 - path: patch.yaml
   target:

@@ -1,0 +1,47 @@
+version: "3"
+
+tasks:
+  install:
+    desc: Install tool dependencies to run this demo on macos
+    summary: |
+      Install tool dependencies on your mac thanks to brew. The following tools will be installed if not present:
+      * kubectl
+      * helm
+      * helmfile
+      * sops
+      * kubeseal
+      * linkerd
+    deps:
+      - requirements
+
+  requirements:
+    desc: Check required packages packages
+    summary: |
+      Check if dependencies are present and install them if not present on your mac.
+    deps:
+      - install-brew
+    cmds:
+      - task deps:need PACKAGE=kubernetes-cli
+      - task deps:need PACKAGE=helm
+      - task deps:need PACKAGE=helmfile
+      - task deps:need PACKAGE=sops
+      - task deps:need PACKAGE=kubeseal
+      - task deps:need PACKAGE=linkerd
+    silent: true
+    internal: true
+
+  need:
+    desc: Check binary is present
+    summary: |
+      Check if binary is present. If not, it will install it thanks to brew.
+      To run this task, you have to give the name of binary like this : PACKAGE=<name of your package>
+    cmds:
+      - command -v {{.PACKAGE}} >/dev/null || brew install --quiet {{.PACKAGE}}
+    silent: true
+
+  install-brew:
+    desc: Install brew package manager if not exist
+    cmds:
+      - command -v brew >/dev/null || /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    silent: true
+    internal: true
