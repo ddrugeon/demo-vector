@@ -3,9 +3,11 @@ api:
   enabled: true
   address: 127.0.0.1:8686
   playground: false
+
 sources:
   host_metrics:
     type: host_metrics
+
 transforms:
   host_metrics_change_tags:
     type: remap
@@ -15,6 +17,7 @@ transforms:
       .tags.environment = "demo"
       del(.tags.host)
       .tags.host = "demo-vector"
+
 sinks:
   stdout:
     type: console

@@ -6,20 +6,27 @@ api:
 sources:
   host_metrics:
     type: host_metrics
+  emojivoto_metrics:
+    type: prometheus_scrape
+    endpoints:
+      - http://emoji-svc.emojivoto.svc.cluster.local:8801/metrics
+    scrape_interval_secs: 60
+
 transforms:
-  host_metrics_change_tags:
+  add_mandatory_tags:
     type: remap
     inputs:
       - host_metrics
+      - emojivoto_metrics
     source: |-
       .tags.environment = "demo"
       del(.tags.host)
       .tags.host = "demo-vector"
+
 sinks:
   stdout:
     type: console
-    target: stdout
     inputs:
-      - host_metrics_change_tags
+      - add_mandatory_tags
     encoding:
       codec: json

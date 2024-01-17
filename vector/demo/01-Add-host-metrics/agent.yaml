@@ -3,9 +3,11 @@ api:
   enabled: true
   address: 127.0.0.1:8686
   playground: false
+
 sources:
   host_metrics:
     type: host_metrics
+
 sinks:
   stdout:
     type: console

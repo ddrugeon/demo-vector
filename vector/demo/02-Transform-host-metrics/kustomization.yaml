@@ -1,7 +1,7 @@
 resources:
-  - ../../base
+  - ../00-Install-vector
 configMapGenerator:
-  - name: vector
+  - name: vector-configuration
     behavior: replace
     files:
       - agent.yaml
