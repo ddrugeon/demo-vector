@@ -6,10 +6,6 @@ tasks:
     summary: |
       Install tool dependencies on your mac thanks to brew. The following tools will be installed if not present:
       * kubectl
-      * helm
-      * helmfile
-      * sops
-      * kubeseal
       * linkerd
     deps:
       - requirements
@@ -20,13 +16,8 @@ tasks:
       Check if dependencies are present and install them if not present on your mac.
     deps:
       - install-brew
-    cmds:
-      - task deps:need PACKAGE=kubernetes-cli
-      - task deps:need PACKAGE=helm
-      - task deps:need PACKAGE=helmfile
-      - task deps:need PACKAGE=sops
-      - task deps:need PACKAGE=kubeseal
-      - task deps:need PACKAGE=linkerd
+      - check-kubernetes-cli
+      - check-linkerd
     silent: true
     internal: true
 
@@ -45,3 +36,19 @@ tasks:
       - command -v brew >/dev/null || /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     silent: true
     internal: true
+
+  check-kubernetes-cli:
+    desc: check if kubectl is already installed on system
+    cmds:
+      - task deps:need PACKAGE=kubernetes-cli
+    silent: true
+    internal: true
+    run: once
+
+  check-linkerd:
+    desc: check if linkerd is already installed on system
+    cmds:
+      - task deps:need PACKAGE=linkerd
+    silent: true
+    internal: true
+    run: once

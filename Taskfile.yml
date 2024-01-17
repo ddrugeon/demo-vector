@@ -6,6 +6,7 @@ dotenv:
 includes:
   deps: .taskfiles/Taskfile_{{OS}}.yml
   k8s: .taskfiles/Taskfile_kubernetes.yml
+  demo-vector: .taskfiles/Taskfile_demo.yml
 
 tasks:
   default:
