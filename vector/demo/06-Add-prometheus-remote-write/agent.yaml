@@ -70,3 +70,7 @@ sinks:
       strategy: basic
       user: ${GRAFANA_CLOUD_USER_ID}
       password: ${GRAFANA_CLOUD_API_KEY}
+  trash:
+    type: blackhole
+    inputs:
+      - metrics_aggregate
