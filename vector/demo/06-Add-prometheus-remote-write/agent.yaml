@@ -1,0 +1,72 @@
+data_dir: /vector-data-dir
+api:
+  enabled: true
+  address: 127.0.0.1:8686
+  playground: false
+
+sources:
+  host_metrics:
+    type: host_metrics
+  fake_logs:
+    type: demo_logs
+    format: apache_common
+  emojivoto_metrics:
+    type: prometheus_scrape
+    endpoints:
+      - http://emoji-svc.emojivoto.svc.cluster.local:8801/metrics
+    scrape_interval_secs: 60
+
+transforms:
+  add_mandatory_tags:
+    type: remap
+    inputs:
+      - host_metrics
+      - emojivoto_metrics
+    source: |-
+      .tags.environment = "demo"
+      del(.tags.host)
+      .tags.host = "demo-vector"
+  apache_logs_to_json:
+    type: remap
+    inputs:
+      - fake_logs
+    source: |-
+      . = parse_apache_log!(.message, format: "common")
+  apache_json_logs_remove_user:
+    type: remap
+    inputs:
+      - apache_logs_to_json
+    source: |-
+        del(.user)
+  apache_json_logs_to_metric:
+    type: log_to_metric
+    inputs:
+      - apache_logs_to_json
+    metrics:
+      - type: counter
+        field: status
+        name: response_total
+        namespace: front
+        tags:
+            host: demo-vector
+            environment: "demo"
+            status: |-
+              {{ print "{{ .status }}" }}
+  metrics_aggregate:
+    type: aggregate
+    inputs:
+      - apache_json_logs_to_metric
+
+sinks:
+  grafana_cloud:
+    type: prometheus_remote_write
+    inputs:
+      - add_mandatory_tags
+      - metrics_aggregate
+    endpoint: ${GRAFANA_CLOUD_URL}
+    healthcheck:
+      enabled: false
+    auth:
+      strategy: basic
+      user: ${GRAFANA_CLOUD_USER_ID}
+      password: ${GRAFANA_CLOUD_API_KEY}
