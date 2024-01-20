@@ -1,0 +1,18 @@
+data_dir: /vector-data-dir
+api:
+  enabled: true
+  address: 127.0.0.1:8686
+  playground: false
+
+sources:
+  host_metrics:
+    type: host_metrics
+
+sinks:
+  stdout:
+    type: console
+    target: stdout
+    inputs:
+      - host_metrics
+    encoding:
+      codec: json

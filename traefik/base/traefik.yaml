@@ -42,7 +42,7 @@ spec:
             - --ping.entryPoint=web
             - --tracing=true
             - --tracing.jaeger=true
-            - --tracing.jaeger.collector.endpoint=http://collector.linkerd-jaeger:9411/api/traces?format=jaeger.thrift
+            - --tracing.jaeger.collector.endpoint=http://collector.linkerd-jaeger.svc.cluster.local:14268/api/traces?format=jaeger.thrift
             - --accesslog=true # output log to stdout
           ports:
             - name: web

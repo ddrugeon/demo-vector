@@ -1,0 +1,35 @@
+version: "3"
+
+tasks:
+  check-deps:
+    desc: check if kind is already installed on your system
+    cmds:
+      - task deps:need PACKAGE=k3d
+    internal: true
+    silent: true
+    run: once
+
+  create:
+    desc: create k3d k8s cluster
+    deps: [check-deps]
+    cmds:
+      - k3d cluster create demo-vector
+
+  destroy:
+    desc: destroy k3d k8s cluster
+    deps: [check-deps]
+    cmds:
+      - k3d cluster delete demo-vector
+
+  list:
+    desc: Get k3d k8s clusters
+    deps: [check-deps]
+    cmds:
+      - k3d cluster list
+    silent: false
+
+  check:
+    desc: check if k3d k8s cluster is running
+    deps: [check-deps]
+    cmds:
+      - kubectl cluster-info --context k3d-demo-vector

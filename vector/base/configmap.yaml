@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: vector
+  name: vector-configuration
   labels:
     app.kubernetes.io/name: vector
     app.kubernetes.io/instance: vector
@@ -19,9 +19,11 @@ data:
       internal_metrics:
         type: internal_metrics
     sinks:
-      type: console
-      target: stdout
-      inputs:
-        - internal_metrics
-      encoding:
-        codec: json
+      stdout:
+        type: console
+        target: stdout
+        inputs:
+          - internal_metrics
+        encoding:
+          codec: json
+

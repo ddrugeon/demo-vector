@@ -1,0 +1,48 @@
+version: "3"
+
+includes:
+  deps: ./Taskfile_{{OS}}.yml
+
+tasks:
+  install:
+    desc: install vector without any configuration
+    summary: |
+      install vector out of the box with default configuration.
+      in this step, vector is configured to get internal_metrics and expose them directly in stdout without any
+      transformation
+    cmds:
+      - kubectl apply -k vector/demo/00-Install-vector
+
+  cleanup:
+    desc: uninstall vector
+    summary: |
+      uninstall vector.
+    cmds:
+      - kubectl delete -k vector/demo/00-Install-vector
+
+  step-01:
+    desc: configure vector to get host metrics
+    summary: |
+      configure vector to get host metrics.
+      in this step, vector is configured to get host metrics and expose them directly in stdout without any
+      transformation
+    cmds:
+      - kubectl apply -k vector/demo/01-Add-host-metrics
+
+  step-02:
+    desc: configure vector to get host metrics and add some usefull tags
+    summary: |
+      configure vector to get host metrics.
+      in this step, vector is configured to get host metrics, transform these metrics to add usefull tags and expose
+      them directly in stdout
+    cmds:
+      - kubectl apply -k vector/demo/02-Transform-host-metrics
+
+  step-03:
+    desc: configure vector to get scrape prometheus metrics from emojivoto and add some usefull tags
+    summary: |
+      configure vector to get host metrics and scrape prometheus metrics from emojivoto application.
+      in this step, vector is configured to get host metrics and prometheus metrics from emojivoto, transform
+      these metrics to add usefull tags and expose them directly in stdout
+    cmds:
+      - kubectl apply -k vector/demo/03-Scrape-emojivoto-metrics

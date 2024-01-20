@@ -81,7 +81,7 @@ spec:
           projected:
             sources:
               - configMap:
-                  name: vector
+                  name: vector-configuration
         - name: data
           hostPath:
             path: "/var/lib/vector"

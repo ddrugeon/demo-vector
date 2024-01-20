@@ -1,0 +1,40 @@
+version: "3"
+
+tasks:
+  check-deps:
+    desc: check if kind is already installed on your system
+    cmds:
+      - task deps:need PACKAGE=orbstack
+    silent: true
+    internal: true
+    run: once
+
+  start:
+    desc: Start orb k8s cluster
+    deps: [check-deps]
+    cmds:
+      - orb start k8s
+
+  stop:
+    desc: Stop orb k8s cluster
+    deps: [check-deps]
+    cmds:
+      - orb stop k8s
+
+  restart:
+    desc: Restart orb k8s cluster
+    deps: [check-deps]
+    cmds:
+      - orb restart k8s
+
+  destroy:
+    desc: Destroy orb k8s cluster
+    deps: [check-deps]
+    cmds:
+      - orb delete k8s
+
+  check:
+    desc: check if orb k8s cluster is running
+    deps: [check-deps]
+    cmds:
+      - kubectl cluster-info --context orbstack

@@ -1,8 +1,7 @@
-namespace: default
+namespace: traefik
 resources:
 - crd
 - namespace.yaml
 - rbac.yaml
 - traefik.yaml
 - ingressclass.yaml
-- dashboard-ingressroute.yaml

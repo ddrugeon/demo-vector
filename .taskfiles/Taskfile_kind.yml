@@ -1,0 +1,34 @@
+version: "3"
+
+tasks:
+  check-deps:
+    desc: check if kind is already installed on your system
+    cmds:
+      - task deps:need PACKAGE=kind
+    internal: true
+    silent: true
+
+  create:
+    desc: create kind k8s cluster
+    deps: [check-deps]
+    cmds:
+      - kind create cluster --name demo-vector
+
+  destroy:
+    desc: destroy kind k8s cluster
+    deps: [check-deps]
+    cmds:
+      - kind delete cluster --name demo-vector
+
+  check:
+    desc: check if kind k8s cluster is running
+    deps: [check-deps]
+    cmds:
+      - kubectl cluster-info --context kind-demo-vector
+
+  list:
+    desc: Get kind k8s clusters
+    deps: [check-deps]
+    cmds:
+      - kind get clusters
+    silent: false
