@@ -7,7 +7,7 @@ metadata:
 data:
   endpoints.json: |
     {
-      "apiArticlesEndpoint": "http://microservices.127.0.0.1.nip.io/admin/",
+      "apiArticlesEndpoint": "http://microservices.127.0.0.1.nip.io/api-article/article",
       "otelEndpoint": "http://otel.127.0.0.1.nip.io/v1/traces"
     }
 ---
@@ -31,7 +31,6 @@ metadata:
   namespace: application
 data:
   nginx.conf: |
-    load_module /opt/opentelemetry-webserver-sdk/WebServerModule/Nginx/1.25.3/ngx_http_opentelemetry_module.so;
 
     events {
       worker_connections  1024;
@@ -94,13 +93,13 @@ data:
           proxy_set_header X-Forwarded-Port $server_port;
       }
     }
-  opentelemetry_module.conf: |
-    NginxModuleEnabled ON;
-    NginxModuleOtelSpanExporter otlp;
-    NginxModuleOtelExporterEndpoint simplest-collector:4317;
-    NginxModuleServiceName reverse-proxy;
-    NginxModuleServiceNamespace application;
-    NginxModuleServiceInstanceId NGinxInstance-1;
-    NginxModuleResolveBackends ON;
-    NginxModuleTraceAsError ON;
+#  opentelemetry_module.conf: |
+#    NginxModuleEnabled ON;
+#    NginxModuleOtelSpanExporter otlp;
+#    NginxModuleOtelExporterEndpoint simplest-collector:4317;
+#    NginxModuleServiceName reverse-proxy;
+#    NginxModuleServiceNamespace application;
+#    NginxModuleServiceInstanceId NGinxInstance-1;
+#    NginxModuleResolveBackends ON;
+#    NginxModuleTraceAsError ON;
 ---

@@ -114,6 +114,8 @@ spec:
               value: "true"
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
               value: "simplest-collector:4317"
+            - name: LOG_LEVEL
+              value: debug
           ports:
             - name: http
               containerPort: 8080
@@ -363,83 +365,3 @@ spec:
           items:
             - key: endpoints.json
               path: endpoints.json
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name:  reverse-proxy
-  namespace: "application"
-  labels:
-    app.kubernetes.io/name: reverse-proxy
-    app.kubernetes.io/instance: microservices
-spec:
-  selector:
-    matchLabels:
-      app.kubernetes.io/name: reverse-proxy
-      app.kubernetes.io/instance: microservices
-  replicas: 1
-  template:
-    metadata:
-      labels:
-        app.kubernetes.io/name: reverse-proxy
-        app.kubernetes.io/instance: microservices
-    spec:
-      containers:
-      - name:  reverse-proxy
-        image:  gbloquel/microservices-demo-nginx-otel
-        securityContext:
-          readOnlyRootFilesystem: true
-        resources:
-          requests:
-            cpu: 125m
-            memory: 128Mi
-          limits:
-            cpu: 250m
-            memory: 256Mi
-        livenessProbe:
-          tcpSocket:
-            port: 80
-          initialDelaySeconds: 5
-          timeoutSeconds: 5
-          successThreshold: 1
-          failureThreshold: 3
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 80
-          initialDelaySeconds: 5
-          timeoutSeconds: 2
-          successThreshold: 1
-          failureThreshold: 3
-          periodSeconds: 10
-        ports:
-        - containerPort:  80
-          name:  reverse-proxy
-        volumeMounts:
-          - mountPath: /etc/nginx/nginx.conf
-            name: nginx-config-volume
-            subPath: nginx.conf
-          - mountPath: /etc/nginx/conf.d
-            name: reverse-proxy-config-volume
-          - mountPath: /var/cache/nginx
-            name: cache-volume
-          - mountPath: /var/run
-            name: pid-volume
-      volumes:
-      - name: cache-volume
-        emptyDir: {}
-      - name: pid-volume
-      - name: nginx-config-volume
-        configMap:
-          name: nginx-global-conf
-      - name: reverse-proxy-config-volume
-        configMap:
-          name: reverse-proxy-config
-          items:
-            - key: default.conf
-              path: default.conf
-            - key: opentelemetry_module.conf
-              path: opentelemetry_module.conf
-      restartPolicy: Always
-

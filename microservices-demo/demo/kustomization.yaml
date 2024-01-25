@@ -1,6 +1,22 @@
 namespace: wescale
 resources:
   - ../base
+images:
+  - name: "gbloquel/microservices-demo-article-service"
+    newName: "ghcr.io/ddrugeon/microservices-demo/article-service"
+    newTag: latest
+  - name: "gbloquel/microservices-demo-cart-service"
+    newName: "ghcr.io/ddrugeon/microservices-demo/cart-service"
+    newTag: latest
+  - name: "gbloquel/microservices-demo-frontend-admin"
+    newName: "ghcr.io/ddrugeon/microservices-demo/frontend-admin"
+    newTag: latest
+  - name: "gbloquel/microservices-demo-frontend-user"
+    newName: "ghcr.io/ddrugeon/microservices-demo/frontend-user"
+    newTag: latest
+  - name: "gbloquel/microservices-demo-nginx-otel"
+    newName: "nginx"
+    newTag: "1.19"
 patches:
 - target:
     group: apps

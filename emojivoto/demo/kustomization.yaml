@@ -1,3 +1,4 @@
+namespace: "emojivoto"
 resources:
 - ../base/
 - ingress.yaml
