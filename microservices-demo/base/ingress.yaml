@@ -1,0 +1,25 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: microservices-ingress
+  namespace: "application"
+  annotations:
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://otel.127.0.0.1.nip.io/v1/traces"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "POST, OPTIONS"
+  labels:
+    app.kubernetes.io/name: ingress
+    app.kubernetes.io/instance: microservices
+spec:
+  rules:
+  - host: "microservices.127.0.0.1.nip.io"
+    http:
+      paths:
+      - path: /
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: reverse-proxy
+            port:
+              number: 8080

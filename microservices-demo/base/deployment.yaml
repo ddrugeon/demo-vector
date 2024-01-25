@@ -1,0 +1,445 @@
+
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cart-service
+  namespace: "application"
+  labels:
+    app.kubernetes.io/name: cart-service
+    app.kubernetes.io/instance: microservices
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: cart-service
+      app.kubernetes.io/instance: microservices
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: cart-service
+        app.kubernetes.io/instance: microservices
+    spec:
+      serviceAccountName: default
+      securityContext:
+        {}
+      containers:
+        - name: cart-service
+          securityContext:
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+          image: "gbloquel/microservices-demo-cart-service:latest"
+          imagePullPolicy: Always
+          env:
+            - name: REDIS_URI
+              value: redis://microservices-redis:6379
+            - name: SERVICE_NAME
+              value: cart-service
+            - name: INSECURE_MODE
+              value: "true"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "simplest-collector:4317"
+          ports:
+            - name: http
+              containerPort: 8081
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            limits:
+              cpu: 50m
+              memory: 32Mi
+            requests:
+              cpu: 50m
+              memory: 32Mi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: article-service
+  namespace: "application"
+  labels:
+    app.kubernetes.io/name: article-service
+    app.kubernetes.io/instance: microservices
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: article-service
+      app.kubernetes.io/instance: microservices
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: article-service
+        app.kubernetes.io/instance: microservices
+    spec:
+      serviceAccountName: default
+      securityContext:
+        {}
+      containers:
+        - name: article-service
+          securityContext:
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+          image: "gbloquel/microservices-demo-article-service:latest"
+          imagePullPolicy: Always
+          env:
+            - name: MONGODB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: database
+            - name: MONGODB_URI
+              value: mongodb://root:$(MONGODB_PASSWORD)@microservices-mongodb:27017
+            - name: SERVICE_NAME
+              value: article-service
+            - name: INSECURE_MODE
+              value: "true"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "simplest-collector:4317"
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            limits:
+              cpu: 50m
+              memory: 32Mi
+            requests:
+              cpu: 50m
+              memory: 32Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  microservices-redis
+  namespace: "application"
+  labels:
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/instance: microservices
+    app.kubernetes.io/component: primary
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: redis
+      app.kubernetes.io/instance: microservices
+      app.kubernetes.io/component: primary
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: redis
+        app.kubernetes.io/instance: microservices
+        app.kubernetes.io/component: primary
+    spec:
+      containers:
+      - name:  microservices-redis
+        image:  redis:7-alpine
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 400m
+            memory: 200Mi
+        livenessProbe:
+          exec:
+            command:
+              - redis-cli
+              - ping
+        ports:
+        - containerPort:  6379
+          name:  redis
+      restartPolicy: Always
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: microservices-mongo
+  namespace: "application"
+  labels:
+    app.kubernetes.io/name: mongodb
+    app.kubernetes.io/instance: microservices
+    app.kubernetes.io/component: primary
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mongodb
+      app.kubernetes.io/instance: microservices
+      app.kubernetes.io/component: primary
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: mongodb
+        app.kubernetes.io/instance: microservices
+        app.kubernetes.io/component: primary
+    spec:
+      containers:
+      - name: mongo
+        image: mongo:7
+        securityContext:
+          runAsUser: 999
+          runAsNonRoot: true
+        ports:
+        - containerPort: 27017
+          name: mongo
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          value: root
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: database
+              key: password
+        readinessProbe:
+          exec:
+             command:
+                - bash
+                - -ec
+                - |
+                  echo "Bye bye!" # HERE must remove the `exit 1`
+                  mongo --eval 'db.runCommand("ping").ok' 127.0.0.1:27017/test && echo 0 || echo 1
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+        livenessProbe:
+          exec:
+            command:
+                - bash
+                - -ec
+                - |
+                  mongo --eval 'db.runCommand("ping").ok' 127.0.0.1:27017/test && echo 0 || echo 1
+          initialDelaySeconds: 10
+          timeoutSeconds: 5
+        volumeMounts:
+        - mountPath: /data/db
+          name: mongo-volume-1
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "300m"
+          limits:
+            memory: "1Gi"
+            cpu: "1"
+      volumes:
+      - emptyDir: {}
+        name: mongo-volume-1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: front-admin
+  namespace: "application"
+  labels:
+    app.kubernetes.io/name: front-admin
+    app.kubernetes.io/instance: microservices
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: front-admin
+      app.kubernetes.io/instance: microservices
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: front-admin
+        app.kubernetes.io/instance: microservices
+    spec:
+      serviceAccountName: default
+      securityContext:
+        {}
+      containers:
+        - name: front-admin
+          image: "gbloquel/microservices-demo-frontend-admin:latest"
+          imagePullPolicy: Always
+          securityContext:
+            readOnlyRootFilesystem: true
+          ports:
+            - name: http
+              containerPort: 80
+          volumeMounts:
+          - mountPath: /usr/share/nginx/html/config
+            name: frontadmin-config-volume
+          - mountPath: /var/cache/nginx
+            name: cache-volume
+          - mountPath: /var/run
+            name: pid-volume
+          resources:
+            requests:
+              memory: 50Mi
+              cpu: 100m
+            limits:
+              memory: 100Mi
+              cpu: 200m
+      volumes:
+      - name: cache-volume
+        emptyDir: {}
+      - name: pid-volume
+      - name: frontadmin-config-volume
+        configMap:
+          name: front-admin-config
+          items:
+            - key: endpoints.json
+              path: endpoints.json
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: front-user
+  namespace: "application"
+  labels:
+    app.kubernetes.io/name: front-user
+    app.kubernetes.io/instance: microservices
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: front-user
+      app.kubernetes.io/instance: microservices
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: front-user
+        app.kubernetes.io/instance: microservices
+    spec:
+      serviceAccountName: default
+      securityContext:
+        {}
+      containers:
+        - name: front-user
+          image: "gbloquel/microservices-demo-frontend-user:latest"
+          imagePullPolicy: Always
+          securityContext:
+            readOnlyRootFilesystem: true
+          ports:
+            - name: http
+              containerPort: 80
+          volumeMounts:
+          - mountPath: /usr/share/nginx/html/config
+            name: frontuser-config-volume
+          - mountPath: /var/cache/nginx
+            name: cache-volume
+          - mountPath: /var/run
+            name: pid-volume
+          resources:
+            requests:
+              memory: 50Mi
+              cpu: 100m
+            limits:
+              memory: 100Mi
+              cpu: 200m
+      volumes:
+      - name: cache-volume
+        emptyDir: {}
+      - name: pid-volume
+      - name: frontuser-config-volume
+        configMap:
+          name: front-user-config
+          items:
+            - key: endpoints.json
+              path: endpoints.json
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  reverse-proxy
+  namespace: "application"
+  labels:
+    app.kubernetes.io/name: reverse-proxy
+    app.kubernetes.io/instance: microservices
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: reverse-proxy
+      app.kubernetes.io/instance: microservices
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: reverse-proxy
+        app.kubernetes.io/instance: microservices
+    spec:
+      containers:
+      - name:  reverse-proxy
+        image:  gbloquel/microservices-demo-nginx-otel
+        securityContext:
+          readOnlyRootFilesystem: true
+        resources:
+          requests:
+            cpu: 125m
+            memory: 128Mi
+          limits:
+            cpu: 250m
+            memory: 256Mi
+        livenessProbe:
+          tcpSocket:
+            port: 80
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 3
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          timeoutSeconds: 2
+          successThreshold: 1
+          failureThreshold: 3
+          periodSeconds: 10
+        ports:
+        - containerPort:  80
+          name:  reverse-proxy
+        volumeMounts:
+          - mountPath: /etc/nginx/nginx.conf
+            name: nginx-config-volume
+            subPath: nginx.conf
+          - mountPath: /etc/nginx/conf.d
+            name: reverse-proxy-config-volume
+          - mountPath: /var/cache/nginx
+            name: cache-volume
+          - mountPath: /var/run
+            name: pid-volume
+      volumes:
+      - name: cache-volume
+        emptyDir: {}
+      - name: pid-volume
+      - name: nginx-config-volume
+        configMap:
+          name: nginx-global-conf
+      - name: reverse-proxy-config-volume
+        configMap:
+          name: reverse-proxy-config
+          items:
+            - key: default.conf
+              path: default.conf
+            - key: opentelemetry_module.conf
+              path: opentelemetry_module.conf
+      restartPolicy: Always
+

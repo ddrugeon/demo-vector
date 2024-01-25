@@ -1,0 +1,147 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: reverse-proxy
+  namespace: "application"
+  labels:
+    app.kubernetes.io/name: reverse-proxy
+    app.kubernetes.io/instance: microservices
+spec:
+  selector:
+    app.kubernetes.io/name: reverse-proxy
+    app.kubernetes.io/instance: microservices
+  type: ClusterIP
+  sessionAffinity: None
+  ports:
+  - name: reverse-proxy
+    protocol: TCP
+    port: 8080
+    targetPort: reverse-proxy
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: microservices-mongodb
+  namespace: "application"
+  labels:
+    app.kubernetes.io/name: mongodb
+    app.kubernetes.io/instance: microservices
+    app.kubernetes.io/component: primary
+spec:
+  type: ClusterIP
+  sessionAffinity: None
+  ports:
+    - name: mongo
+      port: 27017
+      protocol: TCP
+      targetPort: mongo
+      nodePort: null
+  selector:
+    app.kubernetes.io/name: mongodb
+    app.kubernetes.io/instance: microservices
+    app.kubernetes.io/component: primary
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: microservices-redis
+  namespace: "application"
+  labels:
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/instance: microservices
+    app.kubernetes.io/component: primary
+spec:
+  type: ClusterIP
+  sessionAffinity: None
+  ports:
+    - name: redis
+      port: 6379
+      protocol: TCP
+      targetPort: redis
+      nodePort: null
+  selector:
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/instance: microservices
+    app.kubernetes.io/component: primary
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cart-service
+  namespace: "application"
+  labels:
+    app.kubernetes.io/name: cart-service
+    app.kubernetes.io/instance: microservices
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: cart-service
+    app.kubernetes.io/instance: microservices
+  ports:
+    - port: 8081
+      targetPort: http
+      protocol: TCP
+      name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: article-service
+  namespace: "application"
+  labels:
+    app.kubernetes.io/name: article-service
+    app.kubernetes.io/instance: microservices
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: article-service
+    app.kubernetes.io/instance: microservices
+  ports:
+    - port: 8080
+      targetPort: http
+      protocol: TCP
+      name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: front-admin
+  namespace: "application"
+  labels:
+    app.kubernetes.io/name: front-admin
+    app.kubernetes.io/instance: microservices
+spec:
+  type: ClusterIP
+  sessionAffinity: None
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: http
+      nodePort: null
+  selector:
+    app.kubernetes.io/name: front-admin
+    app.kubernetes.io/instance: microservices
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: front-user
+  namespace: "application"
+  labels:
+    app.kubernetes.io/name: front-user
+    app.kubernetes.io/instance: microservices
+spec:
+  type: ClusterIP
+  sessionAffinity: None
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: http
+      nodePort: null
+  selector:
+    app.kubernetes.io/name: front-user
+    app.kubernetes.io/instance: microservices

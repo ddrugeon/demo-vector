@@ -1,0 +1,46 @@
+namespace: wescale
+resources:
+  - ../base
+patches:
+- target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: cart-service
+  path: patch.yaml
+- target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: article-service
+  path: patch.yaml
+- target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: microservices-redis
+  path: patch.yaml
+- target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: microservices-mongo
+  path: patch.yaml
+- target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: front-admin
+  path: patch.yaml
+- target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: front-user
+  path: patch.yaml
+- target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: reverse-proxy
+  path: patch.yaml

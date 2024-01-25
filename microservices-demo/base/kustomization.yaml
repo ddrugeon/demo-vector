@@ -1,0 +1,9 @@
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - secret.yaml
+  - serviceaccount.yaml
+  - deployment.yaml
+  - service.yaml
+  - mongodb_exporter.yaml
+  - ingress.yaml
