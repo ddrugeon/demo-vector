@@ -1,0 +1,45 @@
+version: "3"
+
+includes:
+  application: ./Taskfile_uninstall_k8s_applications.yml
+
+tasks:
+  linkerd:
+    desc: uninstall linkerd
+    summary: |
+      Uninstall linkerd on your local kubernetes cluster
+
+      This command uninstall linkerd on your local kubernetes cluster. It also
+      uninstall viz and jaeger plugins
+    preconditions:
+      - sh: "which linkerd"
+        msg: "linkerd {{.PATH_ERROR}}"
+    cmds:
+      - linkerd jaeger uninstall | kubectl delete -f -
+      - linkerd viz uninstall | kubectl delete -f -
+      - linkerd uninstall | kubectl delete -f -
+
+  traefik:
+    desc: uninstall traefik
+    summary: |
+      Uninstall traefik on your local kubernetes cluster
+
+      This command uninstall traefik on your local kubernetes cluster and
+      custom resource definitions specified by traefik.
+    preconditions:
+      - sh: "which kubectl"
+        msg: "kubernetes-cli {{.PATH_ERROR}}"
+    cmds:
+      - kubectl delete -k ./traefik/demo
+
+  reloader:
+    desc: uninstall reloader
+    summary: |
+      Uninstall reloader on your local kubernetes cluster
+
+      This command uninstall reloader on your local kubernetes cluster.
+    preconditions:
+      - sh: "which kubectl"
+        msg: "kubernetes-cli {{.PATH_ERROR}}"
+    cmds:
+      - kubectl delete -k ./reloader/base

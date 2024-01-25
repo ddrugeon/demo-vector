@@ -1,8 +1,5 @@
 version: "3"
 
-includes:
-  deps: ./Taskfile_{{OS}}.yml
-
 tasks:
   install:
     desc: install vector without any configuration

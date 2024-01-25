@@ -1,97 +1,43 @@
 version: "3"
 
 includes:
-  deps: ./Taskfile_{{OS}}.yml
   orb: ./Taskfile_orb.yml
   k3d: ./Taskfile_k3d.yml
   kind: ./Taskfile_kind.yml
+  install: ./Taskfile_install_k8s_tools.yml
+  uninstall: ./Taskfile_uninstall_k8s_tools.yml
 
 tasks:
   get-contexts:
-    desc: return well-known contexts in kubernetes config file
-    deps: [deps:check-kubernetes-cli]
+    desc: return kubernetes contexts
+    summary: |
+      List known contexts defined in your kubernetes config file.
     cmds:
       - kubectl config get-contexts
 
   use-context:
     desc: switch context to one specified
-    deps: [deps:check-kubernetes-cli]
     summary: |
       switch to kubernetes context given by environment variable CONTEXT
       available contexts should be:
       * orbstack
       * kind-demo-vector
       * k3d-demo-vector
-
     cmds:
       - kubectl config use-context {{.CONTEXT}}
 
   get-pods:
     desc: get running pods
-    deps: [deps:check-kubernetes-cli]
     cmds:
       - kubectl get pods --all-namespaces=true
 
-  install-linkerd:
-    desc: install linkerd into kubernetes cluster
-    deps: [deps:check-linkerd]
-    cmds:
-      - linkerd install --crds | kubectl apply -f -
-      - linkerd install --set proxyInit.runAsRoot=true | kubectl apply -f -
-      - linkerd viz install | kubectl apply -f -
-      - linkerd jaeger install | kubectl apply -f -
-
   check-linkerd-status:
     desc: check linkerd installation
-    deps: [deps:check-linkerd]
     cmds:
       - linkerd check
 
   linkerd-dashboard:
     desc: Access to linkerd dashboard
-    deps: [deps:check-linkerd]
     cmds:
       - linkerd viz dashboard
 
-  uninstall-linkerd:
-    desc: uninstall linkerd
-    cmds:
-      - linkerd jaeger uninstall | kubectl delete -f -
-      - linkerd viz uninstall | kubectl delete -f -
-      - linkerd uninstall | kubectl delete -f -
-
-  install-traefik:
-    desc: install traefik
-    deps: [deps:check-kubernetes-cli]
-    cmds:
-      - kubectl apply -k ./traefik/demo
-
-  uninstall-traefik:
-    desc: uninstall traefik
-    deps: [deps:check-kubernetes-cli]
-    cmds:
-      - kubectl delete -k ./traefik/demo
-
-  install-emojivoto:
-    desc: install emojivoto
-    deps: [deps:check-kubernetes-cli]
-    cmds:
-      - kubectl apply -k ./emojivoto/demo
-
-  uninstall-emojivoto:
-    desc: uninstall emojivoto
-    deps: [deps:check-kubernetes-cli]
-    cmds:
-      - kubectl delete -k ./emojivoto/demo
-
-  install-reloader:
-    desc: install reloader
-    deps: [deps:check-kubernetes-cli]
-    cmds:
-      - kubectl apply -k ./reloader/base
-
-  uninstall-reloader:
-    desc: uninstall reloader
-    deps: [deps:check-kubernetes-cli]
-    cmds:
-      - kubectl delete -k ./reloader/base

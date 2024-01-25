@@ -1,0 +1,11 @@
+version: "3"
+
+tasks:
+  emojivoto:
+    desc: install emojivoto
+    cmds:
+      - kubectl apply -k ./emojivoto/demo
+  microservices-demo:
+    desc: install wescale microservices-demo
+    cmds:
+      - kubectl apply -k ./microservices-demo/demo

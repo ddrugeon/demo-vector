@@ -1,34 +1,57 @@
 version: "3"
 
 tasks:
-  check-deps:
-    desc: check if kind is already installed on your system
-    cmds:
-      - task deps:need PACKAGE=kind
-    internal: true
-    silent: true
-
   create:
-    desc: create kind k8s cluster
-    deps: [check-deps]
+    desc: create local kind cluster
+    preconditions:
+      - sh: "which kind"
+        msg: "kind {{.PATH_ERROR}}"
+    summary: |
+      Creating a kind cluster
+
+      This command creates a cluster named 'kind-demo-vector' using the specified configuration file
+      'config/kind.yaml'. It ensures that the cluster is created with all the correct parameters and waits for it
+      to be ready. It also automatically updates your KUBECONFIG file to include the new cluster entry and sets
+      it as the default cluster. By specifying the cluster name, it avoids creating resources on non-local clusters
+      that may be configured in your KUBECONFIG file.
     cmds:
-      - kind create cluster --name demo-vector
+      - kind delete cluster --name kind-demo-vector
+      - kind create cluster --config config/kind.yaml
 
   destroy:
     desc: destroy kind k8s cluster
-    deps: [check-deps]
+    preconditions:
+      - sh: "which kind"
+        msg: "kind {{.PATH_ERROR}}"
+    summary: |
+      Destroy a kind cluster
+
+      This command creates a cluster named 'kind-demo-vector' using the specified configuration file
+      'config/kind.yaml'. It ensures that the cluster is created with all the correct parameters and waits for it
+      to be ready. It also automatically updates your KUBECONFIG file to include the new cluster entry and sets
+      it as the default cluster. By specifying the cluster name, it avoids creating resources on non-local clusters
+      that may be configured in your KUBECONFIG file.
+
     cmds:
-      - kind delete cluster --name demo-vector
+      - kind delete cluster --name kind-demo-vector
 
   check:
     desc: check if kind k8s cluster is running
-    deps: [check-deps]
+    preconditions:
+      - sh: "which kubectl"
+        msg: "kubernetes-cli {{.PATH_ERROR}}"
     cmds:
       - kubectl cluster-info --context kind-demo-vector
 
   list:
     desc: Get kind k8s clusters
-    deps: [check-deps]
+    summary: |
+      Listing created kind clusters
+
+      This command lists kind clusters already created.
+    preconditions:
+      - sh: "which kind"
+        msg: "kind {{.PATH_ERROR}}"
     cmds:
       - kind get clusters
     silent: false

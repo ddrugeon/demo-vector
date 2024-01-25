@@ -1,0 +1,12 @@
+version: "3"
+
+tasks:
+  emojivoto:
+    desc: uninstall emojivoto
+    cmds:
+      - kubectl delete -k ./emojivoto/demo
+
+  microservices-demo:
+    desc: uninstall wescale microservices-demo
+    cmds:
+      - kubectl delete -k ./microservices-demo/demo

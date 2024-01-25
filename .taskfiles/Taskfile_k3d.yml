@@ -1,35 +1,66 @@
 version: "3"
 
 tasks:
-  check-deps:
-    desc: check if kind is already installed on your system
-    cmds:
-      - task deps:need PACKAGE=k3d
-    internal: true
-    silent: true
-    run: once
-
   create:
-    desc: create k3d k8s cluster
-    deps: [check-deps]
+    desc: create local k3d cluster
+    preconditions:
+      - sh: "which k3d"
+        msg: "k3d {{.PATH_ERROR}}"
+    summary: |
+      Creating a k3d cluster
+
+      This command creates a cluster named 'k3d-demo-vector' using the specified configuration file
+      'config/k3d.yaml'. It ensures that the cluster is created with all the correct parameters and waits for it
+      to be ready. It also automatically updates your KUBECONFIG file to include the new cluster entry and sets
+      it as the default cluster. By specifying the cluster name, it avoids creating resources on non-local clusters
+      that may be configured in your KUBECONFIG file.
+
     cmds:
-      - k3d cluster create demo-vector
+      - k3d cluster delete --config config/k3d.yaml
+      - k3d cluster create --config config/k3d.yaml
 
   destroy:
-    desc: destroy k3d k8s cluster
-    deps: [check-deps]
+    desc: destroy your local k3d cluster
+    preconditions:
+      - sh: "which k3d"
+        msg: "k3d {{.PATH_ERROR}}"
+    summary: |
+      Deleting a k3d cluster
+
+      As part of the cleanup process, you need to delete a k3d cluster that is no longer needed.
+      This command destroy cluster named 'k3d-demo-vector' using the specified configuration file
+      'config/k3d.yaml'.
+      Deleting the cluster will remove all associated resources and free up system resources.
+      It also automatically updates your KUBECONFIG file to remove the cluster entry.
+
+      Note: Deleting a k3d cluster is an irreversible action, so make sure you no longer need the cluster and
+      its resources before performing this task.
+
     cmds:
-      - k3d cluster delete demo-vector
+      - k3d cluster delete --config config/k3d.yaml
+    ignore_error: true
 
   list:
-    desc: Get k3d k8s clusters
-    deps: [check-deps]
+    desc: Get k3d clusters
+    preconditions:
+      - sh: "which k3d"
+        msg: "k3d {{.PATH_ERROR}}"
+    summary: |
+      Listing created k3d clusters
+
+      This command lists k3d clusters already created.
     cmds:
       - k3d cluster list
     silent: false
 
   check:
-    desc: check if k3d k8s cluster is running
-    deps: [check-deps]
+    desc: check if k3d cluster is running
+    preconditions:
+      - sh: "which kubectl"
+        msg: "kubectl {{.PATH_ERROR}}"
+    summary: |
+      Checking a k3d cluster
+
+      This command check if kubectl can access to control plane API of k3d-demo-vector cluster
     cmds:
       - kubectl cluster-info --context k3d-demo-vector

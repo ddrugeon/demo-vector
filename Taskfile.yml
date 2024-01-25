@@ -2,14 +2,22 @@ version: '3'
 
 dotenv:
   - '.env'
+  - '.envrc'
+
+vars:
+  PATH_ERROR: is not installed or correctly configured in PATH.
 
 includes:
-  deps: .taskfiles/Taskfile_{{OS}}.yml
+  install: .taskfiles/Taskfile_install.yml
   k8s: .taskfiles/Taskfile_kubernetes.yml
   demo-vector: .taskfiles/Taskfile_demo.yml
 
 tasks:
   default:
     desc: List all tasks
+    summary: |
+      List all known tasks
+
+      This command list available tasks on this project.
     cmds:
       - task --list-all

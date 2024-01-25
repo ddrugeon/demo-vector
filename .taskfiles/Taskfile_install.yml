@@ -1,0 +1,59 @@
+version: "3"
+
+tasks:
+  kind:
+    desc: Install kind tool
+    summary: |
+      Install kind
+
+      This command install kind on your machine to easily manage k3d clusters
+    cmds:
+      - |
+        echo -e "Installing kind" && \
+        {{if eq OS "windows"}}choco install kind \
+        {{else}}brew install kind{{end}}
+  k3d:
+    desc: Install k3d tool
+    summary: |
+      Install k3d
+
+      This command install k3d on your machine to easily manage k3d clusters
+    cmds:
+      - |
+        echo -e "Installing k3d" && \
+        {{if eq OS "windows"}}choco install k3d \
+        {{else}}brew install k3d{{end}}
+  kustomize:
+    desc: Install kustomize tool
+    summary: |
+      Install kustomize
+
+      This command install kustomize on your machine to generate kubernetes manifests
+      cmds:
+      - |
+        echo -e "Installing kustomize" && \
+        {{if eq OS "windows"}}choco install kustomize \
+        {{else}}brew install kustomize{{end}}
+  kubectl:
+    desc: Install kubectl tool
+    summary: |
+      Install kubectl
+
+      This command install kubectl on your machine to interact with your cluster
+    cmds:
+    - |
+      echo -e "Installing kubectl" && \
+      {{if eq OS "windows"}}choco install kubernetes-cli \
+      {{else}}brew install kubernetes-cli{{end}}
+  linkerd:
+    desc: Install linkerd tool
+    summary: |
+      Install linkerd
+
+      This command install linkerd on your machine to install linkerd service mesh
+      on your local cluster
+    cmds:
+    - |
+      echo -e "Installing linkerd" && \
+      {{if eq OS "windows"}}choco install linkerd \
+      {{else}}brew install linkerd{{end}}
