@@ -2,7 +2,7 @@ apiVersion: k3d.io/v1alpha5
 kind: Simple
 
 metadata:
-  name: k3d-demo-vector
+  name: demo-vector
 servers: 1
 agents: 2
 kubeAPI:
@@ -26,6 +26,9 @@ options:
       - settings.workerConnections=2048
   k3s:
     extraArgs:
+    - arg: --no-deploy=traefik
+      nodeFilters:
+      - server:*
     - arg: --disable=traefik
       nodeFilters:
       - server:*

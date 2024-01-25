@@ -15,7 +15,7 @@ tasks:
       it as the default cluster. By specifying the cluster name, it avoids creating resources on non-local clusters
       that may be configured in your KUBECONFIG file.
     cmds:
-      - kind delete cluster --name kind-demo-vector
+      - kind delete cluster --name demo-vector
       - kind create cluster --config config/kind.yaml
 
   destroy:
@@ -33,7 +33,7 @@ tasks:
       that may be configured in your KUBECONFIG file.
 
     cmds:
-      - kind delete cluster --name kind-demo-vector
+      - kind delete cluster --name demo-vector
 
   check:
     desc: check if kind k8s cluster is running

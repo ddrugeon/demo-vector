@@ -43,3 +43,15 @@ tasks:
         msg: "kubernetes-cli {{.PATH_ERROR}}"
     cmds:
       - kubectl delete -k ./reloader/base
+
+  nginx:
+    desc: uninstall nginx ingress controller  into kubernetes cluster
+    summary: |
+      Uninstall nginx ingress controller on your local kubernetes cluster
+
+      This command uninstall nginx ingress controller on your local kubernetes cluster.
+    preconditions:
+      - sh: "which kubectl"
+        msg: "kubernetes-cli {{.PATH_ERROR}}"
+    cmds:
+      - kubectl delete -k ./nginx/demo

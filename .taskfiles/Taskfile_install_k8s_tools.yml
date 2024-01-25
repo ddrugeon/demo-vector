@@ -44,3 +44,14 @@ tasks:
         msg: "kubernetes-cli {{.PATH_ERROR}}"
     cmds:
       - kubectl apply -k ./reloader/base
+  nginx:
+    desc: install nginx ingress controller  into kubernetes cluster
+    summary: |
+      Install nginx ingress controller on your local kubernetes cluster
+
+      This command install nginx ingress controller on your local kubernetes cluster.
+    preconditions:
+      - sh: "which kubectl"
+        msg: "kubernetes-cli {{.PATH_ERROR}}"
+    cmds:
+      - kubectl apply -k ./nginx/demo
