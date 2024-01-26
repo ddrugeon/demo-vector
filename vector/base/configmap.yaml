@@ -19,11 +19,7 @@ data:
       internal_metrics:
         type: internal_metrics
     sinks:
-      stdout:
-        type: console
-        target: stdout
+      trash:
+        type: blackhole
         inputs:
           - internal_metrics
-        encoding:
-          codec: json
-

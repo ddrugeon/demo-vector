@@ -1,0 +1,62 @@
+data_dir: /vector-data-dir
+api:
+  enabled: true
+  address: 127.0.0.1:8686
+  playground: false
+
+sources:
+#  host_metrics:
+#    type: host_metrics
+
+  emojivoto_metrics:
+    # Scrape prometheus metrics from emoji-svc (namespace: emojivoto)
+    # note that we will add the tag component to each metric and
+    # its value corresponds to endpoint
+    type: prometheus_scrape
+    endpoints:
+      - http://emoji-svc.emojivoto.svc.cluster.local:8801/metrics
+      - http://voting-svc.emojivoto.svc.cluster.local:8801/metrics
+    scrape_interval_secs: 10
+    instance_tag: "component"
+
+transforms:
+  filter_grpc_metrics:
+    # Remove prometheus metrics that do not correspond to promhttp_metric_handler_requests_total
+    type: filter
+    inputs:
+      - emojivoto_metrics
+    condition:
+      type: "vrl"
+      source: '.name == "promhttp_metric_handler_requests_total"'
+
+  rename_component_string:
+    # From prometheus metrics, reformat tag component to have the name of
+    # the service and not the endpoint
+
+    type: remap
+    inputs:
+      - filter_grpc_metrics
+    source: |-
+      message_parts = split!(.tags.component, ".", limit: 3)
+      del(.tags.component)
+      .tags.component = message_parts[0]
+      .tags.namespace = message_parts[1]
+
+  add_mandatory_tags:
+    # For each metric or logs, we add mandatory tags like environment or the name of host
+    type: remap
+    inputs:
+      - rename_component_string
+    source: |-
+      .tags.environment = get_env_var!("ENVIRONMENT")
+      del(.tags.host)
+      .tags.host = "demo-vector"
+
+sinks:
+  stdout:
+    type: console
+    target: stdout
+    inputs:
+      - add_mandatory_tags
+    encoding:
+      codec: json

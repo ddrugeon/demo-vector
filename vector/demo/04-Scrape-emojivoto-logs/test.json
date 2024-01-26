@@ -1,0 +1,50 @@
+{
+  "file": "/var/log/pods/emojivoto_voting-dc6c7dbb6-5tm6x_bcc258cf-e753-46d6-a425-37761d780478/voting-svc/0.log",
+  "kubernetes": {
+    "container_id": "containerd://4d232ea8d840d4f424def58287be14bb02d54d63ea00b696e80bf778910ab5d2",
+    "container_image": "docker.l5d.io/buoyantio/emojivoto-voting-svc:v11",
+    "container_image_id": "docker.l5d.io/buoyantio/emojivoto-voting-svc@sha256:a57ac67af7a5b05988a38b49568eca6a078ef27a71c148c44c9db4efb1dac58b",
+    "container_name": "voting-svc",
+    "namespace_labels": {
+      "kubernetes.io/metadata.name": "emojivoto"
+    },
+    "node_labels": {
+      "beta.kubernetes.io/arch": "arm64",
+      "beta.kubernetes.io/os": "linux",
+      "kubernetes.io/arch": "arm64",
+      "kubernetes.io/hostname": "demo-vector-worker",
+      "kubernetes.io/os": "linux"
+    },
+    "pod_annotations": {
+      "config.alpha.linkerd.io/trace-collector-service-account": "collector",
+      "config.linkerd.io/trace-collector": "collector.linkerd-jaeger:55678",
+      "jaeger.linkerd.io/tracing-enabled": "true",
+      "linkerd.io/created-by": "linkerd/proxy-injector stable-2.14.8",
+      "linkerd.io/inject": "enabled",
+      "linkerd.io/proxy-version": "stable-2.14.8",
+      "linkerd.io/trust-root-sha256": "7bb7d15524fb53feaa450e2180e6fafe344fac397b98d960a4959df2d390d34a",
+      "viz.linkerd.io/tap-enabled": "true"
+    },
+    "pod_ip": "10.244.1.34",
+    "pod_ips": [
+      "10.244.1.34"
+    ],
+    "pod_labels": {
+      "app": "voting-svc",
+      "linkerd.io/control-plane-ns": "linkerd",
+      "linkerd.io/proxy-deployment": "voting",
+      "linkerd.io/workload-ns": "emojivoto",
+      "pod-template-hash": "dc6c7dbb6",
+      "version": "v11"
+    },
+    "pod_name": "voting-dc6c7dbb6-5tm6x",
+    "pod_namespace": "emojivoto",
+    "pod_node_name": "demo-vector-worker",
+    "pod_owner": "ReplicaSet/voting-dc6c7dbb6",
+    "pod_uid": "bcc258cf-e753-46d6-a425-37761d780478"
+  },
+  "message": "2024/01/25 21:26:49 Voted for [:heart_eyes_cat:], which now has a total of [22] votes",
+  "source_type": "kubernetes_logs",
+  "stream": "stderr",
+  "timestamp": "2024-01-25T21:26:49.446651412Z"
+}

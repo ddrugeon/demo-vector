@@ -3,14 +3,17 @@ api:
   enabled: true
   address: 127.0.0.1:8686
   playground: false
+
 sources:
   host_metrics:
     type: host_metrics
+
   emojivoto_metrics:
     type: prometheus_scrape
     endpoints:
       - http://emoji-svc.emojivoto.svc.cluster.local:8801/metrics
-    scrape_interval_secs: 60
+      - http://voting-svc.emojivoto.svc.cluster.local:8801/metrics
+    scrape_interval_secs: 10
 
 transforms:
   add_mandatory_tags:
@@ -19,13 +22,14 @@ transforms:
       - host_metrics
       - emojivoto_metrics
     source: |-
-      .tags.environment = "demo"
+      .tags.environment = "exemple"
       del(.tags.host)
       .tags.host = "demo-vector"
 
 sinks:
   stdout:
     type: console
+    target: stdout
     inputs:
       - add_mandatory_tags
     encoding:

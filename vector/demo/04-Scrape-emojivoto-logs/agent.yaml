@@ -1,0 +1,62 @@
+data_dir: /vector-data-dir
+api:
+  enabled: true
+  address: 127.0.0.1:8686
+  playground: false
+
+sources:
+#  host_metrics:
+#    type: host_metrics
+
+  emojivoto_metrics:
+    type: prometheus_scrape
+    endpoints:
+      - http://emoji-svc.emojivoto.svc.cluster.local:8801/metrics
+    scrape_interval_secs: 10
+
+  emojivoto_vote_metrics:
+    type: prometheus_scrape
+    endpoints:
+      - http://voting-svc.emojivoto.svc.cluster.local:8801/metrics
+    scrape_interval_secs: 10
+
+  emojivoto_logs:
+    type: kubernetes_logs
+
+transforms:
+  filter_grpc_metrics:
+    type: filter
+    inputs:
+      - emojivoto_metrics
+      - emojivoto_vote_metrics
+    condition:
+      type: "vrl"
+      source: '.name == "grpc_server_msg_sent_total"'
+
+  add_mandatory_tags:
+    type: remap
+    inputs:
+#      - host_metrics
+      - filter_grpc_metrics
+      - emojivoto_logs
+    source: |-
+      .tags.environment = "demo"
+      del(.tags.host)
+      .tags.host = "demo-vector"
+
+  filter_emojivoto_logs:
+    type: filter
+    inputs:
+      - emojivoto_logs
+    condition:
+      type: "vrl"
+      source: '.kubernetes.container_name == "voting-svc"'
+sinks:
+  stdout:
+    type: console
+    target: stdout
+    inputs:
+      - filter_emojivoto_logs
+    encoding:
+      codec: json
+

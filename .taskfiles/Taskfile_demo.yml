@@ -33,7 +33,7 @@ tasks:
       in this step, vector is configured to get host metrics, transform these metrics to add usefull tags and expose
       them directly in stdout
     cmds:
-      - kubectl apply -k vector/demo/02-Transform-host-metrics
+      - kubectl apply -k vector/demo/02-Scrape-emojivoto-metrics
 
   step-03:
     desc: configure vector to get scrape prometheus metrics from emojivoto and add some usefull tags
@@ -42,4 +42,13 @@ tasks:
       in this step, vector is configured to get host metrics and prometheus metrics from emojivoto, transform
       these metrics to add usefull tags and expose them directly in stdout
     cmds:
-      - kubectl apply -k vector/demo/03-Scrape-emojivoto-metrics
+      - kubectl apply -k vector/demo/03-reduce-metrics
+
+  step-04:
+    desc: configure vector to get scrape prometheus metrics from emojivoto and add some usefull tags
+    summary: |
+      configure vector to get host metrics and scrape prometheus metrics from emojivoto application.
+      in this step, vector is configured to get host metrics and prometheus metrics from emojivoto, transform
+      these metrics to add usefull tags and expose them directly in stdout
+    cmds:
+      - kubectl apply -k vector/demo/04-Scrape-emojivoto-logs
