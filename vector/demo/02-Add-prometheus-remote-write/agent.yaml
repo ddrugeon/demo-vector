@@ -1,0 +1,45 @@
+data_dir: /vector-data-dir
+api:
+  enabled: true
+  address: 127.0.0.1:8686
+  playground: false
+
+timezone: "Etc/UTC"
+
+sources:
+  host_metrics:
+    type: host_metrics
+
+  internal_metrics:
+    type: internal_metrics
+
+transforms:
+  add_mandatory_tags:
+    type: remap
+    inputs:
+      - host_metrics
+      - internal_metrics
+    source: |-
+      .tags.environment = get_env_var!("ENVIRONMENT")
+      .tags.cluster_name = "demo-vector"
+
+sinks:
+  stdout:
+    type: console
+    target: stdout
+    inputs:
+      - add_mandatory_tags
+    encoding:
+      codec: json
+
+  grafana_cloud:
+    type: prometheus_remote_write
+    inputs:
+      - add_mandatory_tags
+    endpoint: ${GRAFANA_CLOUD_URL}
+    healthcheck:
+      enabled: false
+    auth:
+      strategy: basic
+      user: "${GRAFANA_CLOUD_USER_ID}"
+      password: ${GRAFANA_CLOUD_API_KEY}

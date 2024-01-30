@@ -75,7 +75,11 @@ spec:
             - mountPath: "/host/sys"
               name: sysfs
               readOnly: true
-      terminationGracePeriodSeconds: 60
+            - mountPath: "/etc/localtime"
+              name: localtime
+              readOnly: true
+      terminationGracePeriodSeconds: 120
+      shareProcessNamespace: true
       volumes:
         - name: config
           projected:
@@ -97,3 +101,6 @@ spec:
         - hostPath:
             path: "/sys"
           name: sysfs
+        - hostPath:
+            path: "/etc/localtime"
+          name: "localtime"

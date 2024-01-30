@@ -1,0 +1,42 @@
+{
+  "file": "/var/log/pods/wescale_article-service-547ddcf7df-9999b_86a9e7bf-7f5f-4207-ac56-a3359977562a/article-service/0.log",
+  "kubernetes": {
+    "container_id": "containerd://530d745dd2641c873c9a99d5a7685363ee7967d616573b1634f3d1258545d838",
+    "container_image": "ghcr.io/ddrugeon/microservices-demo/article-service:latest",
+    "container_image_id": "ghcr.io/ddrugeon/microservices-demo/article-service@sha256:ee1362a0e3d3dd410e6f73eec5758b3c179c242827f21f5c6240a73412ed1a95",
+    "container_name": "article-service",
+    "namespace_labels": {
+      "kubernetes.io/metadata.name": "wescale"
+    },
+    "node_labels": {
+      "beta.kubernetes.io/arch": "arm64",
+      "beta.kubernetes.io/os": "linux",
+      "kubernetes.io/arch": "arm64",
+      "kubernetes.io/hostname": "demo-vector-worker",
+      "kubernetes.io/os": "linux"
+    },
+    "pod_annotations": {
+      "config.alpha.linkerd.io/trace-collector-service-account": "collector",
+      "config.linkerd.io/trace-collector": "collector.linkerd-jaeger:55678",
+      "linkerd.io/inject": "enabled"
+    },
+    "pod_ip": "10.244.1.21",
+    "pod_ips": [
+      "10.244.1.21"
+    ],
+    "pod_labels": {
+      "app.kubernetes.io/instance": "microservices",
+      "app.kubernetes.io/name": "article-service",
+      "pod-template-hash": "547ddcf7df"
+    },
+    "pod_name": "article-service-547ddcf7df-9999b",
+    "pod_namespace": "wescale",
+    "pod_node_name": "demo-vector-worker",
+    "pod_owner": "ReplicaSet/article-service-547ddcf7df",
+    "pod_uid": "86a9e7bf-7f5f-4207-ac56-a3359977562a"
+  },
+  "message": "{\"level\":\"debug\",\"msg\":\"Healthz successful - OK\",\"time\":\"2024-01-30 20:38:28Z\"}",
+  "source_type": "kubernetes_logs",
+  "stream": "stderr",
+  "timestamp": "2024-01-30T20:38:28.880363655Z"
+}

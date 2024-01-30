@@ -20,35 +20,59 @@ tasks:
   step-01:
     desc: configure vector to get host metrics
     summary: |
-      configure vector to get host metrics.
-      in this step, vector is configured to get host metrics and expose them directly in stdout without any
-      transformation
+      configure vector to get host metrics in addition to internal metrics.
+      in this step, vector is configured to get host metrics, internal_metrics  and expose them directly in
+      stdout without any transformation
     cmds:
       - kubectl apply -k vector/demo/01-Add-host-metrics
 
   step-02:
-    desc: configure vector to get host metrics and add some usefull tags
+    desc: configure vector to export host and internal metrics to Grafana Cloud
     summary: |
-      configure vector to get host metrics.
-      in this step, vector is configured to get host metrics, transform these metrics to add usefull tags and expose
-      them directly in stdout
+      configure vector to export host and internal metrics to Grafana Cloud
+      Before sending metrics to Grafana Cloud, we add some additional tags like cluster_name and environment
     cmds:
-      - kubectl apply -k vector/demo/02-Scrape-emojivoto-metrics
+      - kubectl apply -k vector/demo/02-Add-prometheus-remote-write
 
   step-03:
-    desc: configure vector to get scrape prometheus metrics from emojivoto and add some usefull tags
+    desc: configure vector to scrape prometheus metrics from application
     summary: |
-      configure vector to get host metrics and scrape prometheus metrics from emojivoto application.
-      in this step, vector is configured to get host metrics and prometheus metrics from emojivoto, transform
-      these metrics to add usefull tags and expose them directly in stdout
+      configure vector to scrape prometheus metrics from wescale application
+      some processing is done to extract component and namespace from metrics endpoints.
     cmds:
-      - kubectl apply -k vector/demo/03-reduce-metrics
+      - kubectl apply -k vector/demo/03-Scrape-application-metrics
 
   step-04:
-    desc: configure vector to get scrape prometheus metrics from emojivoto and add some usefull tags
+    desc: configure vector to scrape kubernetes logs
+    summary: |
+      configure vector to scrape kubernetes logs without any transformation
+      metrics processed in step-03 are sent to Grafana Cloud
+    cmds:
+      - kubectl apply -k vector/demo/04-Scrape-application-logs
+
+  step-05:
+    desc: configure vector to scrape kubernetes logs and process them
+    summary: |
+      configure vector to scrape kubernetes logs and process them to extract useful information
+      metrics processed in step-03 are sent to Grafana Cloud
+    cmds:
+      - kubectl apply -k vector/demo/05-Transform-application-logs
+
+  step-06:
+    desc: configure vector to scrape kubernetes logs and process them
+    summary: |
+      configure vector to scrape kubernetes logs and process them to remove DEBUG logs
+      metrics processed in step-03 are sent to Grafana Cloud
+    cmds:
+      - kubectl apply -k vector/demo/06-Remove-debug-logs
+
+  step-07:
+    desc: configure vector to send applicative logs to loki
     summary: |
       configure vector to get host metrics and scrape prometheus metrics from emojivoto application.
       in this step, vector is configured to get host metrics and prometheus metrics from emojivoto, transform
       these metrics to add usefull tags and expose them directly in stdout
     cmds:
-      - kubectl apply -k vector/demo/04-Scrape-emojivoto-logs
+      - kubectl apply -k vector/demo/07-add-log-exporter
+
+

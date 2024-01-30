@@ -4,9 +4,13 @@ api:
   address: 127.0.0.1:8686
   playground: false
 
+timezone: "Etc/UTC"
+
 sources:
   host_metrics:
     type: host_metrics
+  internal_metrics:
+        type: internal_metrics
 
 sinks:
   stdout:
@@ -14,5 +18,6 @@ sinks:
     target: stdout
     inputs:
       - host_metrics
+      - internal_metrics
     encoding:
       codec: json

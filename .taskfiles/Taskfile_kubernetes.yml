@@ -41,3 +41,10 @@ tasks:
     cmds:
       - linkerd viz dashboard
 
+
+  generate-secrets:
+    desc: generate mandatory secrets for the demo
+    cmds:
+      - kubectl create secret generic -o yaml --dry-run=client grafana-cloud-metrics --from-literal=url=${GRAFANA_CLOUD_URL} --from-literal=user=${GRAFANA_CLOUD_USER_ID} --from-literal=api_key=${GRAFANA_CLOUD_API_KEY} > ./vector/base/Secrets.yaml
+      -  echo "---" >> ./vector/base/Secrets.yaml
+      - kubectl create secret generic -o yaml --dry-run=client grafana-cloud-logs --from-literal=url=${GRAFANA_CLOUD_LOKI_URL} --from-literal=user=${GRAFANA_CLOUD_LOKI_USER_ID} --from-literal=api_key=${GRAFANA_CLOUD_API_KEY} >> ./vector/base/Secrets.yaml

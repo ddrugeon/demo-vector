@@ -1,0 +1,29 @@
+- op: add
+  path: "/spec/template/spec/containers/0/env/-"
+  value:
+    name: ENVIRONMENT
+    value: "demo"
+- op: add
+  path: "/spec/template/spec/containers/0/env/-"
+  value:
+    name: GRAFANA_CLOUD_URL
+    valueFrom:
+      secretKeyRef:
+        key: url
+        name: grafana-cloud-metrics
+- op: add
+  path: "/spec/template/spec/containers/0/env/-"
+  value:
+    name: GRAFANA_CLOUD_USER_ID
+    valueFrom:
+      secretKeyRef:
+        key: user
+        name: grafana-cloud-metrics
+- op: add
+  path: "/spec/template/spec/containers/0/env/-"
+  value:
+    name: GRAFANA_CLOUD_API_KEY
+    valueFrom:
+      secretKeyRef:
+        key: api_key
+        name: grafana-cloud-metrics

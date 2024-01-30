@@ -1,0 +1,167 @@
+data_dir: /vector-data-dir
+api:
+  enabled: true
+  address: 127.0.0.1:8686
+  playground: false
+
+timezone: "Etc/UTC"
+sources:
+  host_metrics:
+    type: host_metrics
+
+  internal_metrics:
+    type: internal_metrics
+
+  application_metrics:
+    type: prometheus_scrape
+    endpoints:
+      - http://article-service.wescale.svc.cluster.local:8080/metrics
+      - http://cart-service.wescale.svc.cluster.local:8081/metrics
+    scrape_interval_secs: 10
+    instance_tag: "component"
+
+  kubernetes_logs:
+    # Scrape all logs from kubernetes
+    type: kubernetes_logs
+
+transforms:
+  rename_component_string:
+    # From prometheus metrics, reformat tag component to have the name of
+    # the service and not the endpoint
+
+    type: remap
+    inputs:
+      - application_metrics
+    source: |-
+      message_parts = split!(.tags.component, ".", limit: 3)
+      del(.tags.component)
+      .tags.component = message_parts[0]
+      .tags.namespace = message_parts[1]
+
+  process_kubernetes_logs:
+    type: filter
+    inputs:
+      - kubernetes_logs
+    condition:
+      type: "vrl"
+      source: exists(.kubernetes.pod_namespace) && .kubernetes.pod_namespace=="wescale"
+
+  process_applicative_logs:
+    # From kubernetes logs, extract useful information
+    type: remap
+    inputs:
+      - process_kubernetes_logs
+    source: |-
+      if exists(.kubernetes.pod_labels."app.kubernetes.io/instance") {
+          .tags.component = .kubernetes.pod_labels."app.kubernetes.io/instance"
+      } else if exists(.kubernetes.pod_labels.app) {
+          .tags.component = .kubernetes.pod_labels.app
+      } else if exists(.kubernetes.container_name) {
+          .tags.component = .kubernetes.container_name
+      } else {
+          .tags.component = "unlabeled"
+      }
+
+      if exists(.kubernetes.pod_namespace) {
+          .tags.namespace = .kubernetes.pod_namespace
+      } else {
+          .tags.namespace = "unlabeled"
+      }
+
+      if exists(.kubernetes.node_labels."kubernetes.io/hostname") {
+          .tags.host=.kubernetes.node_labels."kubernetes.io/hostname"
+      } else {
+          .tags.host="demo-vector"
+      }
+
+      .tags.pod = .kubernetes.pod_name
+      .tags.container = .kubernetes.container_name
+      .tags.environment = "demo"
+
+      del(.file)
+      del(.kubernetes)
+      del(.stream)
+      if exists(.message) {
+          .message = parse_json!(string!(.message))
+
+          if exists(.message.level) {
+          .severity = .message.level
+          } else {
+          .severity = "info"
+          }
+
+          if exists(.message.msg) {
+              .message = .message.msg
+          }
+      }
+
+  route_log_severity:
+    type: route
+    inputs:
+      - process_applicative_logs
+    route:
+      useless:
+        type: "vrl"
+        source: exists(.severity) && !includes(["info", "warn", "error", "fatal"], .severity)
+      useful:
+        type: "vrl"
+        source: exists(.severity) && includes(["info", "warn", "error", "fatal"], .severity)
+
+  add_mandatory_tags:
+    type: remap
+    inputs:
+      - host_metrics
+      - internal_metrics
+      - rename_component_string
+    source: |-
+      .tags.environment = get_env_var!("ENVIRONMENT")
+      .tags.cluster_name = "demo-vector"
+
+sinks:
+  stdout:
+    type: console
+    target: stdout
+    inputs:
+      - route_log_severity.useful
+    encoding:
+      codec: json
+      only_fields:
+        - time
+        - message
+        - tags
+        - severity
+  trash:
+    type: blackhole
+    inputs:
+      - route_log_severity.useless
+  grafana_cloud:
+    type: prometheus_remote_write
+    inputs:
+      - add_mandatory_tags
+    endpoint: ${GRAFANA_CLOUD_URL}
+    healthcheck:
+      enabled: false
+    auth:
+      strategy: basic
+      user: "${GRAFANA_CLOUD_USER_ID}"
+      password: ${GRAFANA_CLOUD_API_KEY}
+  loki:
+    type: loki
+    inputs:
+      - route_log_severity.useful
+    auth:
+      strategy: basic
+      user: "${GRAFANA_CLOUD_LOKI_USER_ID}"
+      password: ${GRAFANA_CLOUD_LOKI_API_KEY}
+    endpoint: ${GRAFANA_CLOUD_LOKI_URL}
+    healthcheck:
+      enabled: false
+    encoding:
+      codec: json
+      only_fields:
+        - time
+        - message
+        - tags
+        - severity
+    labels:
+      cluster: k8s-local
