@@ -1,6 +1,0 @@
-resources:
-- namespace.yaml
-- web.yaml
-- emoji.yaml
-- voting.yaml
-- vote-bot.yaml

@@ -45,15 +45,3 @@ tasks:
       echo -e "Installing kubectl" && \
       {{if eq OS "windows"}}choco install kubernetes-cli \
       {{else}}brew install kubernetes-cli{{end}}
-  linkerd:
-    desc: Install linkerd tool
-    summary: |
-      Install linkerd
-
-      This command install linkerd on your machine to install linkerd service mesh
-      on your local cluster
-    cmds:
-    - |
-      echo -e "Installing linkerd" && \
-      {{if eq OS "windows"}}choco install linkerd \
-      {{else}}brew install linkerd{{end}}

@@ -4,34 +4,6 @@ includes:
   application: ./Taskfile_install_k8s_applications.yml
 
 tasks:
-  linkerd:
-    desc: install linkerd into kubernetes cluster
-    summary: |
-      Install linkerd on your local kubernetes cluster
-
-      This command install linkerd on your local kubernetes cluster. It also
-      install viz and jaeger plugins
-    preconditions:
-      - sh: "which linkerd"
-        msg: "linkerd {{.PATH_ERROR}}"
-    cmds:
-      - linkerd install --crds | kubectl apply -f -
-      - linkerd install --set proxyInit.runAsRoot=true | kubectl apply -f -
-      - linkerd viz install | kubectl apply -f -
-      - linkerd jaeger install | kubectl apply -f -
-  traefik:
-    desc: install traefik  into kubernetes cluster
-    summary: |
-      Install traefik on your local kubernetes cluster
-
-      This command install traefik on your local kubernetes cluster as default
-      ingress controller. It also adds custom resource definitions specified
-      by traefik.
-    preconditions:
-      - sh: "which kubectl"
-        msg: "kubernetes-cli {{.PATH_ERROR}}"
-    cmds:
-      - kubectl apply -k ./traefik/demo
   reloader:
     desc: install reloader  into kubernetes cluster
     summary: |
