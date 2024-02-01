@@ -31,17 +31,6 @@ tasks:
     cmds:
       - kubectl get pods --all-namespaces=true
 
-  check-linkerd-status:
-    desc: check linkerd installation
-    cmds:
-      - linkerd check
-
-  linkerd-dashboard:
-    desc: Access to linkerd dashboard
-    cmds:
-      - linkerd viz dashboard
-
-
   generate-secrets:
     desc: generate mandatory secrets for the demo
     cmds:

@@ -89,6 +89,8 @@ To destroy orb cluster:
 ```bash
 task k8s:orb:destroy
 ```
+### Utilities installation
+
 ### Application - Wescale - Microservices-demo
 
 ## Conferences
