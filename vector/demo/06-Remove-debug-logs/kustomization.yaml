@@ -11,4 +11,4 @@ configMapGenerator:
   - name: vector-configuration
     behavior: replace
     files:
-      - agent.yaml
+      - vector.yaml

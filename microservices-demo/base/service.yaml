@@ -36,6 +36,10 @@ spec:
       port: 27017
       protocol: TCP
       targetPort: mongo
+    - name: metrics
+      port: 9216
+      protocol: TCP
+      targetPort: metrics
   selector:
     app.kubernetes.io/name: mongodb
     app.kubernetes.io/instance: microservices
@@ -58,6 +62,10 @@ spec:
       port: 6379
       protocol: TCP
       targetPort: redis
+    - name: metrics
+      port: 9121
+      protocol: TCP
+      targetPort: metrics
   selector:
     app.kubernetes.io/name: redis
     app.kubernetes.io/instance: microservices

@@ -8,16 +8,41 @@ timezone: "Etc/UTC"
 sources:
   host_metrics:
     type: host_metrics
+    namespace: host
+    collectors:
+      - "cpu"
+      - "disk"
+      - "filesystem"
+      - "load"
+      - "host"
+      - "memory"
+      - "network"
+    filesystem:
+      devices:
+        excludes: ["binfmt_misc"]
+      filesystems:
+        excludes: ["binfmt_misc"]
+      mountpoints:
+        excludes: ["*/proc/sys/fs/binfmt_misc"]
+    scrape_interval_secs: 60
 
   internal_metrics:
     type: internal_metrics
+    namespace: vector
+    scrape_interval_secs: 60
+    tags:
+      pid_key: "pid"
+      host_key: "host"
 
   application_metrics:
     type: prometheus_scrape
     endpoints:
       - http://article-service.wescale.svc.cluster.local:8080/metrics
       - http://cart-service.wescale.svc.cluster.local:8081/metrics
-    scrape_interval_secs: 10
+      - http://microservices-redis.wescale.svc.cluster.local:9121/metrics
+      - http://microservices-mongodb.wescale.svc.cluster.local:9216/metrics
+    scrape_interval_secs: 60
+    scrape_timeout_secs: 5
     instance_tag: "component"
 
 transforms:

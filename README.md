@@ -6,88 +6,91 @@ This repository contains companion code for the tools in  action talk: "Avec Vec
 
 ## Pre-requisites
 
+### tasks
+To help installing and executing step by step this demo, you should install [Taskfile](https://taskfile.dev/) on your machine.
 ### Kubernetes cluster
 For demonstration purpose, you can directly run this demo on a local kubernetes cluster like minikube, k3d or kind.
 
-### Application - Emojivoto
-To illustrate this tools in action, I deploy [Bunyant Emojivoto application](https://github.com/BuoyantIO/emojivoto) on a running kubernetes cluster.
+## Demo
 
-To deploy this application, run the following command:
+> **Note:** Thanks to Taskfile, you can list existing tasks
+> ```bash
+> task
+>```
+
+### Provisioning a Local Kubernetes cluster
+I provide some tasks to easily setup a k3d, kind or orb K8s cluster.
+
+#### K3d cluster
+
+To create a k3d cluster:
 ```bash
-kubectl apply -k emojivoto/base/
+task k8s:k3d:create
 ```
 
-And then check if it is properly working:
-
+To list existing k3d clusters:
 ```bash
-kubectl get deploy --namespace emojivoto
+task k8s:k3d:list
 ```
 
+To list check k3d cluster:
 ```bash
-kubectl get svc --namespace emojivoto
+task k8s:k3d:check
 ```
 
-You can port forward web-svc to check if service is healthy:
+To destroy k3d cluster:
 ```bash
-kubectl port-forward -n emojivoto svc/web-svc 9090:80
-```
-and open your browser at http://localhost:9090
-
-### Install linkerd
-
-Install Linkerd
-```bash
-LINKERD2_VERSION=stable-2.14.8 curl -sL https://run.linkerd.io/install | sh
-linkerd install | kubectl apply -f -
+task k8s:k3d:destroy
 ```
 
-Install Linkerd vizualisation plugin
-```bash
-linkerd viz install | kubectl apply -f -
-```
-Check Linkerd installation
+#### Kind cluster
 
+To create a kind cluster:
 ```bash
-linkerd check
-```
-### Install jaeger linkerd plugin
-
-Install Linkerd Jaeger plugin and configure Linkerd Opencensus collector to send spans to our Jaeger backend:
-```bash
-linkerd jaeger install --set collector.jaegerAddr='http://jaeger-collector.tracing:14268/api/traces' | kubectl apply -f -
-```
-### Install traefik
-
-Install traefik on your cluster
-```bash
-kubectl apply -k traefik/demo
+task k8s:kind:create
 ```
 
-You can check if your installation is correct :
-1. Try to access to [Emojivoto homepage](http://emojivoto.127.0.0.1.nip.io/)
-2. Try to access to [Traefik dashboard](http://traefik.127.0.0.1.nip.io:8080/dashboard)
-
-### Observability stacks
-
-- Datadog account
-- Grafana cloud account
-
-## Vector demo
-### Vector installation
->For this demo, I assume to only install vector as a daemonset. It will be deployed in each node of your cluster to
-> scrape logs, metrics and traces. For production environment, I recommend to follow instructions on [Vector documentation - Going to production guide](https://vector.dev/docs/setup/going-to-prod/)
-
-To install vector as a daemonset, apply this command:
+To list existing kind clusters:
 ```bash
-kubectl apply -k vector/base
+task k8s:kind:list
 ```
 
-In this first step, we configure Vector agent to scrape logs and export them to stdout. Host metrics and internal metrics from vector are exported to a prometheus endpoint.
-
-Check if it is correctly installed:
+To list check kind cluster:
 ```bash
-kubectl --namespace vector get daemonsets.apps
+task k8s:kind:check
 ```
+
+To destroy kind cluster:
+```bash
+task k8s:kind:destroy
+```
+
+#### ORB cluster (MacOS X only)
+
+To start a orb cluster:
+```bash
+task k8s:orb:start
+```
+To restart a orb cluster:
+```bash
+task k8s:orb:restart
+```
+To stop a orb cluster:
+```bash
+task k8s:orb:stop
+```
+
+To list check orb cluster:
+```bash
+task k8s:orb:check
+```
+
+To destroy orb cluster:
+```bash
+task k8s:orb:destroy
+```
+### Application - Wescale - Microservices-demo
+
 ## Conferences
 
 - Touraine Tech - February 2024

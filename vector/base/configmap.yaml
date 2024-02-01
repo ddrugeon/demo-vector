@@ -9,17 +9,30 @@ metadata:
     app.kubernetes.io/component: Agent
     app.kubernetes.io/version: "0.35.0-distroless-libc"
 data:
-  agent.yaml: |
+  vector.yaml: |
     data_dir: /vector-data-dir
+
     api:
       enabled: true
       address: 127.0.0.1:8686
       playground: false
+
+    timezone: "Etc/UTC"
+
     sources:
       internal_metrics:
         type: internal_metrics
+        namespace: vector
+        scrape_interval_secs: 60
+        tags:
+          pid_key: "pid"
+          host_key: "host"
+
     sinks:
-      trash:
-        type: blackhole
+      stdout:
+        type: console
+        target: stdout
         inputs:
           - internal_metrics
+        encoding:
+          codec: json

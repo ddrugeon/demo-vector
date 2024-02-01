@@ -1,0 +1,46 @@
+data_dir: /vector-data-dir
+api:
+  enabled: true
+  address: 127.0.0.1:8686
+  playground: false
+
+timezone: "Etc/UTC"
+
+sources:
+  host_metrics:
+    type: host_metrics
+    namespace: host
+    collectors:
+      - "cpu"
+      - "disk"
+      - "filesystem"
+      - "load"
+      - "host"
+      - "memory"
+      - "network"
+    filesystem:
+      devices:
+        excludes: ["binfmt_misc"]
+      filesystems:
+        excludes: ["binfmt_misc"]
+      mountpoints:
+        excludes: ["*/proc/sys/fs/binfmt_misc"]
+    scrape_interval_secs: 60
+
+  internal_metrics:
+    type: internal_metrics
+    namespace: vector
+    scrape_interval_secs: 60
+    tags:
+      pid_key: "pid"
+      host_key: "host"
+
+sinks:
+  stdout:
+    type: console
+    target: stdout
+    inputs:
+      - host_metrics
+      - internal_metrics
+    encoding:
+      codec: json

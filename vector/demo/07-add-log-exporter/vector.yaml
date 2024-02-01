@@ -8,16 +8,41 @@ timezone: "Etc/UTC"
 sources:
   host_metrics:
     type: host_metrics
+    namespace: host
+    collectors:
+      - "cpu"
+      - "disk"
+      - "filesystem"
+      - "load"
+      - "host"
+      - "memory"
+      - "network"
+    filesystem:
+      devices:
+        excludes: ["binfmt_misc"]
+      filesystems:
+        excludes: ["binfmt_misc"]
+      mountpoints:
+        excludes: ["*/proc/sys/fs/binfmt_misc"]
+    scrape_interval_secs: 60
 
   internal_metrics:
     type: internal_metrics
+    namespace: vector
+    scrape_interval_secs: 60
+    tags:
+      pid_key: "pid"
+      host_key: "host"
 
   application_metrics:
     type: prometheus_scrape
     endpoints:
       - http://article-service.wescale.svc.cluster.local:8080/metrics
       - http://cart-service.wescale.svc.cluster.local:8081/metrics
-    scrape_interval_secs: 10
+      - http://microservices-redis.wescale.svc.cluster.local:9121/metrics
+      - http://microservices-mongodb.wescale.svc.cluster.local:9216/metrics
+    scrape_interval_secs: 60
+    scrape_timeout_secs: 5
     instance_tag: "component"
 
   kubernetes_logs:
@@ -38,7 +63,7 @@ transforms:
       .tags.component = message_parts[0]
       .tags.namespace = message_parts[1]
 
-  process_kubernetes_logs:
+  filter_only_applicative_logs:
     type: filter
     inputs:
       - kubernetes_logs
@@ -50,7 +75,7 @@ transforms:
     # From kubernetes logs, extract useful information
     type: remap
     inputs:
-      - process_kubernetes_logs
+      - filter_only_applicative_logs
     source: |-
       if exists(.kubernetes.pod_labels."app.kubernetes.io/instance") {
           .tags.component = .kubernetes.pod_labels."app.kubernetes.io/instance"
@@ -95,6 +120,18 @@ transforms:
           }
       }
 
+  route_log_severity:
+    type: route
+    inputs:
+      - process_applicative_logs
+    route:
+      useless:
+        type: "vrl"
+        source: exists(.severity) && !includes(["info", "warn", "error", "fatal"], .severity)
+      useful:
+        type: "vrl"
+        source: exists(.severity) && includes(["info", "warn", "error", "fatal"], .severity)
+
   add_mandatory_tags:
     type: remap
     inputs:
@@ -110,17 +147,27 @@ sinks:
     type: console
     target: stdout
     inputs:
-      - process_applicative_logs
+      - route_log_severity.useful
     encoding:
       codec: json
       only_fields:
         - time
         - message
-        - stream
         - tags
-        - container
         - severity
 
+  debug:
+    type: console
+    target: stdout
+    inputs:
+      - host_metrics
+    encoding:
+      codec: json
+
+  trash:
+    type: blackhole
+    inputs:
+      - route_log_severity.useless
   grafana_cloud:
     type: prometheus_remote_write
     inputs:
@@ -132,3 +179,23 @@ sinks:
       strategy: basic
       user: "${GRAFANA_CLOUD_USER_ID}"
       password: ${GRAFANA_CLOUD_API_KEY}
+  loki:
+    type: loki
+    inputs:
+      - route_log_severity.useful
+    auth:
+      strategy: basic
+      user: "${GRAFANA_CLOUD_LOKI_USER_ID}"
+      password: ${GRAFANA_CLOUD_LOKI_API_KEY}
+    endpoint: ${GRAFANA_CLOUD_LOKI_URL}
+    healthcheck:
+      enabled: false
+    encoding:
+      codec: json
+      only_fields:
+        - time
+        - message
+        - tags
+        - severity
+    labels:
+      cluster: k8s-local
