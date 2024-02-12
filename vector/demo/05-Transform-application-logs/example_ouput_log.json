@@ -1,0 +1,14 @@
+{
+  "message": "Healthz successful - OK",
+  "severity": "debug",
+  "source_type": "kubernetes_logs",
+  "tags": {
+    "component": "microservices",
+    "container": "article-service",
+    "environment": "demo",
+    "host": "demo-vector-worker",
+    "namespace": "wescale",
+    "pod": "article-service-547ddcf7df-9999b"
+  },
+  "timestamp": "2024-01-30T20:38:28.880363655Z"
+}

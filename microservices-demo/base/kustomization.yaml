@@ -5,5 +5,4 @@ resources:
   - serviceaccount.yaml
   - deployment.yaml
   - service.yaml
-  - mongodb_exporter.yaml
   - ingress.yaml
